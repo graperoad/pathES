@@ -9,9 +9,12 @@ package com.pathes
 	import away3d.primitives.CubeGeometry;
 	import away3d.textures.BitmapTexture;
 	
+	import com.pathes.system.ForceCompilation;
+	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
+	import flash.events.Event;
 
 	public class WorldData extends ObjectContainer3D
 	{
@@ -35,7 +38,7 @@ package com.pathes
 			for(var x:Number = 0; x < width; x++) {
 				data.push(new Array());
 				for(var y:Number = 0; y < height; y++) {
-					data[x].push(1);
+					
 					
 					var pixel:uint = noiseMap.getPixel(x,y);
 					var rpixel:uint = pixel >> 16;
@@ -49,6 +52,8 @@ package com.pathes
 					m.z = x * 100;
 					//draw
 					this.addChild( m );
+					
+					data[x].push( { mesh: m, height: m.y } );
 					
 					if(Math.random() < .5) {
 						
@@ -93,14 +98,54 @@ package com.pathes
 						tree.z = x * 100;
 						tree.y = 100;
 						this.addChild(tree);
+						
+						data[x][y].foliage = tree;
 					}
+				}
+			}
+		}
+		
+		public function update():void {
+			var weights:Array = ForceCompilation.get().weights;
+			
+			for each(var entry:Object in weights) {
+				var mx:Number = Math.floor( entry.x / 10 );
+				var my:Number = Math.floor( entry.y / 10 );
+				
+				var surrounding:Number = 1;//Math.floor(entry.weight / 10)
+				for(var ix:Number = -surrounding; ix <= surrounding; ix ++) {
+					for(var iy:Number = -surrounding; iy <= surrounding; iy ++) {
+						
+						if( ix != 0 || iy != 0) {
+							var indX:Number = mx + ix;
+							var indY:Number = my + iy;
+							
+							if( indX >= 0 && indY >=0 && indX < width && indY < height) {	
+								var mo:Mesh = data[indX][indY].mesh;
+								mo.y -= entry.weight / 10;
+							}
+						}
+					}
+				}
+				
+				if(mx >=0 && my >= 0 && mx < width && my & height) {
+					var m:Mesh = data[mx][my].mesh;
+					m.y -= entry.weight / 5;
+				}
+				
+			}
+			
+			for(var x:Number = 0; x < width; x++) {
+				for(var y:Number = 0; y < height; y++) {
+					var m:Mesh = data[x][y].mesh;
+					var diff:Number = data[x][y].height - m.y;
+					m.y += diff * .01;
 				}
 			}
 		}
 		
 		private function makeCube():Mesh {
 			var m:Mesh = new Mesh(new CubeGeometry(), new ColorMaterial(Math.random() * 0xFFFFFF));
-			
 			return m;
 		}
 	}

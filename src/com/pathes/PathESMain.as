@@ -8,6 +8,8 @@ package com.pathes
 	import away3d.primitives.*;
 	import away3d.utils.*;
 	
+	import com.pathes.system.ForceCompilation;
+	
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.geom.Vector3D;
@@ -63,6 +65,7 @@ package com.pathes
 		}
 		
 		protected function onEnterFrame(e:Event):void {
+			worldData.update();
 			_view.render();
 		}
 	}

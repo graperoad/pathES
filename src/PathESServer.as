@@ -1,6 +1,7 @@
 package
 {
 	import com.pathes.PathESMain;
+	import com.pathes.debug.Minimap;
 	
 	import flash.display.Sprite;
 	
@@ -13,6 +14,9 @@ package
 		{
 			worldDisp = new PathESMain();
 			addChild(worldDisp);
+			
+			var debugMap:Minimap = new Minimap();
+			addChild(debugMap);
 		}
 	}
 }
