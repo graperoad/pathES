@@ -10,6 +10,7 @@ package com.pathes.debug
 	{
 		
 		protected var uPoints:Array;
+		protected var s:Sprite;
 		
 		public function Minimap()
 		{
@@ -19,7 +20,7 @@ package com.pathes.debug
 			this.graphics.drawRect(0,0,100,100);
 			
 			//new point
-			var s:Sprite = new Sprite();
+			s = new Sprite();
 			s.graphics.beginFill(0x00FF00);
 			s.graphics.drawCircle(0,0,10);
 			s.buttonMode = true;
@@ -33,7 +34,18 @@ package com.pathes.debug
 		}
 		
 		protected function onE(e:Event):void {
-			ForceCompilation.get().updateWeights(uPoints);
+			var weight:Object = ForceCompilation.get().weights[0];
+			
+			if(weight) {
+			//	trace(weight.x, weight.y);
+				//s.x = (weight.x / 420) * 100;
+				//s.y = (weight.y / 340) * 100;
+				//s.x = (weight.x + .7 )* 60;
+				//s.y = (weight.y - .9) * 30;
+				s.x = weight.x;
+				s.y = weight.y;
+			}
+			//ForceCompilation.get().updateWeights(uPoints);
 		}
 		
 		protected function onMdown(e:MouseEvent):void {

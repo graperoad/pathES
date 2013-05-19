@@ -17,7 +17,10 @@ package com.pathes.system
 			lastWeights = weights;
 			weights = new Array();
 			for each(var entry:Object in positions) {
-				weights.push( { x: entry.x, y: entry.y, weight: 10 } );
+				//mod values
+				var x:Number = (entry.x + .7 )* 60;
+				var y:Number = (entry.y - .9) * 30;
+				weights.push( { x: x, y: y, weight: 10 } );
 			}
 		}
 		
