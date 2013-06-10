@@ -4,25 +4,35 @@ package com.pathes
 	import away3d.materials.TextureMaterial;
 	import away3d.textures.BitmapTexture;
 	
+	import com.pathes.PathesData;
+	import com.pathes.disp.*;
+	
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	
 	public class Treeform extends Sprite3D
 	{
 		public var color:uint;
-		
 		protected var bd:BitmapData;
-		
+		public var life:Number = 100;
+		public var lifeStage:Number = 2;
+		protected var renderer:TreeformRenderer;
 		
 		public function Treeform(col:uint)
 		{
 			
+			if(Math.random() < .5) {
+				renderer = new TreeformRenderer1(col);
+			} else {
+				renderer = new TreeformRenderer2(col);
+			}
+			
 			color = col;
 			
-			stage(2);
+			renderer.stage(lifeStage);
 			
 			//make tree
-			var text:BitmapTexture = new BitmapTexture(bd); // Local var which we will be free up after
+			var text:BitmapTexture = new BitmapTexture(renderer.bd); // Local var which we will be free up after
 			var tmap:TextureMaterial = new TextureMaterial(text,true);
 			tmap.addMethod(PathesData.fog);
 			tmap.alphaBlending = true;
@@ -31,42 +41,56 @@ package com.pathes
 			super(tmap, 100, 100);
 		}
 		
-		public function stage(n:Number = 3):void {
-			bd = new BitmapData(512, 512, true, 0x00000000);
-			var g:Sprite = new Sprite();
-			var tree_height:Number = 512 - (n * 80);
+		public function applyDamage(n:Number):void {
+			life -= n * PathesData.timeScale;
 			
-			var r:uint = color >> 16 & 0xFF;
-			var gee:uint = color >> 8 & 0xFF;
-			var b:uint = color & 0xFF;
+			if(life <= -25) {
+				life = -25;
+				this.visible = false;
+			}
+		}
+		
+		public function addLife(n:Number):void {
+			life += n * PathesData.timeScale;
 			
+			if(life > 125) life = 125;
 			
-			g.graphics.lineStyle(20, 0x330000);
-			g.graphics.moveTo(250, 512);
-			g.graphics.lineTo(250, tree_height);
-			
-			g.graphics.lineStyle(0, 0x000000, 0);
-			g.graphics.beginFill(0x000000, .3);
-			g.graphics.drawCircle(250, 512, 5);
-			
-			g.graphics.lineStyle(1, 0x330000);
-			for ( var i:Number = 0; i< (n*10); i++ ) {
-				g.graphics.moveTo(250, tree_height);
-				var dx:Number = (Math.random() * n * 120 ) + 150;
-				var dy:Number = tree_height - (Math.random() * n * 120 );
+			//if(life > 0) this.visible = true;
+		}
+		
+		public function update():void {
+			if(life > 100) {
+				life -= 1 * PathesData.timeScale;
+				this.height -= .7 * PathesData.timeScale
+				this.width -= .7 * PathesData.timeScale;
 				
-				if( i < (n*4)) {
-					g.graphics.lineStyle(10, 0x330000);
-					g.graphics.lineTo(dx, dy);
+				var newLifeStage:Number = 2;
+				
+				if(life < 30) {
+					newLifeStage = 1;
 				}
 				
-				g.graphics.lineStyle(0, 0x000000, 0);
-				var c:Number = ( r << 16 ) | ( ((i / 30) * 255) << 8 ) | b;
-				g.graphics.beginFill(c, 1);
-				g.graphics.drawCircle(dx, dy, 50);
+				if(life > 85) {
+					newLifeStage = 3;
+				}
+				
+				if(newLifeStage != lifeStage) {
+					renderer.stage(lifeStage);
+					var text:BitmapTexture = new BitmapTexture(renderer.bd); // Local var which we will be free up after
+					var tmap:TextureMaterial = new TextureMaterial(text,true);
+					tmap.addMethod(PathesData.fog);
+					tmap.alphaBlending = true;
+					this.material = tmap;
+					lifeStage = newLifeStage;
+				}
+				
+			} else {
+				if(life <= -25 && Math.random() < .000001) {
+					this.life = 10;
+					this.visible = true;
+				}
 			}
-			
-			bd.draw(g);
 		}
+		
 	}
 }

@@ -20,7 +20,8 @@ package
 	import flash.utils.Dictionary;
 	
 
-	[SWF(backgroundColor="0xec9900" , width="950" , height="600")]
+	//[SWF(backgroundColor="0xec9900" , width="950" , height="600")]
+	[SWF(backgroundColor="0xec9900" , width="1200" , height="800")]
 	public class PathESServer extends Sprite
 	{
 		

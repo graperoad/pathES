@@ -1,6 +1,6 @@
 <pathesConfig>
 	<remote>http://www.dustytome.net/demos/pathes/</remote>
-	<timeModifier>1</timeModifier>
+	<timeModifier>1.1</timeModifier>
 	<updateInterval>5</updateInterval><!--  in seconds -->
-	<worldSize>10</worldSize> <!--  square squares -->
+	<worldSize>12</worldSize> <!--  square squares -->
 </pathesConfig>

@@ -1,6 +1,8 @@
 package com.pathes.system
 {
+	import flash.events.ErrorEvent;
 	import flash.events.Event;
+	import flash.events.IOErrorEvent;
 	import flash.net.NetConnection;
 	import flash.net.Responder;
 	import flash.net.URLLoader;
@@ -18,6 +20,8 @@ package com.pathes.system
 		static public function init(serviceURL:String):void {
 			serviceLoc = serviceURL;
 			l = new URLLoader();
+			l.addEventListener(IOErrorEvent.IO_ERROR, _ioErrorHandler);
+			l.addEventListener(ErrorEvent.ERROR, _errorHandler);
 		}
 		
 		static public function sendWorldData(d:Object, f:Function = null):void {
@@ -28,7 +32,16 @@ package com.pathes.system
 			req.data = dat;
 			req.method = URLRequestMethod.POST;
 			l.addEventListener(Event.COMPLETE, f);
+
 			l.load(req);
+		}
+		
+		static private function _ioErrorHandler(e:IOErrorEvent):void {
+			//fail silently
+		}
+		
+		static private function _errorHandler(e:ErrorEvent):void {
+			//fail silently
 		}
 		
 		static public function genericResponder(e:Event):void {

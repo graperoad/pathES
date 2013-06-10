@@ -20,6 +20,9 @@ package com.pathes
 	import flash.display3D.textures.CubeTexture;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
+	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
 	import flash.geom.Vector3D;
 	import flash.utils.Timer;
 
@@ -45,16 +48,17 @@ package com.pathes
 			addChild(_view);
 			
 			//setup the camera
-			_view.camera.z = -600;
-			_view.camera.y = 500;
-			_view.camera.lookAt(new Vector3D());
+			_view.camera.z = 0;
+			_view.camera.x = 600;
+			_view.camera.y = 600;
+			
 			
 			light1 = new DirectionalLight();
 			light1.direction = new Vector3D(0, -1, 0);
-			light1.color = 0xFFFF99;
-			light1.ambientColor = 0xFFFF99;
-			light1.specular = 0.1;
-			light1.ambient = 0.3;
+			light1.color = 0xFFFF66;
+			light1.ambientColor = 0x0000FF;
+			light1.specular = .3;
+			light1.ambient = 0.5;
 			light1.diffuse = 0.7;
 			
 			
@@ -72,9 +76,10 @@ package com.pathes
 			_view.scene.addChild(_plane);
 			
 			worldData = new WorldData(size, size);
-			worldData.x = -400;
-			worldData.z = -400;
+			worldData.x = -600;
+			worldData.z = -600;
 			_view.scene.addChild( worldData );
+			//
 			
 			_view.backgroundColor = 0xDDDDFF;
 			
@@ -86,6 +91,12 @@ package com.pathes
 			t.start();
 			onTimer();
 			
+			//every 5 minutes
+			var cacheTimer:Timer = new Timer(300000);
+			cacheTimer.addEventListener(TimerEvent.TIMER, saveSnapshot);
+			cacheTimer.start();
+			saveSnapshot();
+			
 			this.addEventListener(Event.ADDED_TO_STAGE, init);
 		}
 		
@@ -96,9 +107,31 @@ package com.pathes
 		protected function onTimer(e:TimerEvent = null):void {
 			trace("Sending data");
 			RemoteLink.sendWorldData(worldData.dataString);
+			
+		}
+		
+		protected function saveSnapshot(e:TimerEvent = null):void {
+			
+			//make sure directory exists
+			var dir:File = File.desktopDirectory.resolvePath("pathesCache");
+			dir.createDirectory();
+			
+
+			
+			//save file
+			var d:Date = new Date();
+			var nom:String = "cache-" + d.day + "-" + d.hours + "-" + d.minutes + ".txt";
+			var file:File = File.desktopDirectory.resolvePath("pathesCache/"+nom); 
+			
+			var myFileStream:FileStream = new FileStream(); 
+			myFileStream.open(file, FileMode.WRITE); 
+			
+			myFileStream.writeUTFBytes(JSON.stringify(worldData.dataString));
+			
 		}
 		
 		protected function onEnterFrame(e:Event):void {
+		//	_view.camera.lookAt(new Vector3D(-600,0,0));
 			worldData.update();
 			_view.render();
 		}
